@@ -6,13 +6,14 @@ function fileExists (filepath, options, done) {
     done = options
     options = {}
   }
+  const _options = options || {};
 
   if (!done) {
     return new Promise((resolve, reject) => {
-      fs.stat(fullPath(filepath, options), (err, stats) => {
+      fs.stat(fullPath(filepath, _options), (err, stats) => {
         if (err) {
           return err.code === 'ENOENT'
-            ? resolve(false)
+            ? resolve(_options.not)
             : reject(err)
         }
         resolve(stats.isFile())
@@ -20,14 +21,15 @@ function fileExists (filepath, options, done) {
     })
   }
 
-  fs.stat(fullPath(filepath, options), (err, stats) => {
+  fs.stat(fullPath(filepath, _options), (err, stats) => {
     if (err) {
       return err.code === 'ENOENT'
-        ? done(null, false)
+        ? done(null, _options.not)
         : done(err)
     }
 
-    done(null, stats.isFile())
+    const exists = stats.isFile()
+    done(null, _options.not ? !exists : exists)
   })
 }
 
@@ -35,7 +37,8 @@ fileExists.sync = function fileExistsSync (filepath, options) {
   const _filepath = filepath || '';
   const _options = options || {};
   try {
-    return fs.statSync(fullPath(_filepath, _options)).isFile()
+    const exists = fs.statSync(fullPath(_filepath, _options)).isFile()
+    return _options.not ? !exists : exists
   }
   catch (e) {
     // Check exception. If ENOENT - no such file or directory ok, file doesn't exist.
@@ -44,7 +47,7 @@ fileExists.sync = function fileExistsSync (filepath, options) {
       throw e
     }
 
-    return false
+    return _options.not
   }
 }
 

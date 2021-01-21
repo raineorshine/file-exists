@@ -46,7 +46,19 @@ test('async', t => {
         t.ok(exists, 'promise: existing file exists')
         done()
       })
-    }
+    },
+    done => {
+      fileExists('not.here', { not: true }, (err, notExists) => {
+        t.ok(notExists, 'file does not exist with "not" option')
+        done()
+      })
+    },
+    done => {
+      fileExists('.tmp/index.html', { not: true }, (err, notExists) => {
+        t.notOk(notExists, 'file does exist with "not" option')
+        done()
+      })
+    },
   ], err => {
     rmdir('.tmp', () => t.end())
   })
@@ -60,6 +72,8 @@ test('sync', t => {
   t.ok(fileExists.sync('/index.html', {root: '.tmp'}), 'file exists in given root directory')
   t.notOk(fileExists.sync('.tmp'), 'directory is not a file')
   t.notOk(fileExists.sync('not.here'), 'non-existing file doesn\'t exist')
+  t.ok(fileExists.sync('not.here', { not: true }), 'file does not exist with "not" option')
+  t.notOk(fileExists.sync('.tmp/index.html', { not: true }), 'file does exist with "not" option')
 
   rmdir('.tmp', () => t.end())
 })
