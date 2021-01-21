@@ -6,6 +6,9 @@
   "directories": {
     "test": "test"
   },
+  "bin": {
+    "file-exists": "bin.js"
+  },
   "scripts": {
     "test": "node test/index.js | tap-format-spec"
   },
@@ -35,5 +38,8 @@
     "mkdirp": "0.5.1",
     "rmdir": "1.2.0",
     "tape": "4.6.3"
+  },
+  "dependencies": {
+    "mri": "^1.1.6"
   }
 }
